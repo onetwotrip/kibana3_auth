@@ -1,0 +1,58 @@
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+  $(document).ready(function()
+  {
+    $('#userInput').focus();
+    $('#loginForm').submit(function(e)
+    {
+      user = $('input[name=user]').val() || Math.random().toString(36).substring(2); // fake user if not given
+      pass = $('input[name=pass]').val();
+      $.ajax(
+        {
+          password:   pass,
+          username:   user,
+          url:        '/auth',
+          type:       'POST',
+          xhrFields:  { withCredentials: true },
+          crossDomain: true,
+          success:    function(response){ 
+            window.location.reload(true);
+          },
+          error:      function(){
+            $('#errorLabel').css('display', 'inline-block');
+          }
+        }
+      );
+      return false;
+    });
+  });
+</script>
+</head>
+<body>
+<style>
+body { background-color: #272b30; color:#ddd; font-family: sans-serif; font-size: 14px }
+fieldset { border: 1px solid; border-radius: 5px; padding: 20px; border-color: #33a9e3; }
+.bucket { width: 100%; font-size: 130%; font-weight:bold; }
+.button { width: 50%; float: right; vertical-align: top; }
+.display { margin: 200px auto; width: 300px;}
+.field { text-align: center; padding: 0 0 2 0 }
+.error { font-size: 100%; color: #FE2E2E; font-weight:bold; display: none;}
+input {  width: 100% }
+</style>
+<div class="bucket">
+  <div class="display">
+  <form id="loginForm"><fieldset>
+    <legend align="center"><%= settings.login_header %></legend>
+    <div class="field"><input id="userInput" type="text" placeholder="username" name="user"></div>
+    <div class="field"><input type="password" placeholder="password" name="pass"></div>
+    <div>
+      <label id="errorLabel" class="error">login failed!</label>
+      <input class="button" type="submit" method="post" value="Log in">
+    <div/>
+  </fieldset></form>
+  </div>
+</div>
+</body>
+</html>
