@@ -51,15 +51,14 @@ class Kibana
 
     def htauth_file
       # read file if it's been updated or never read
-      csum = ::Digest::MD5.file(Config[:auth_file]).digest recue nil
+      csum = ::Digest::MD5.file(Config[:auth_file]).digest
       if @htauth_csum.nil? || csum != @htauth_csum
-        @htauth_file   = HTAuth::PasswdFile.open(Config[:auth_file])
+        @htauth_file = HTAuth::PasswdFile.open(Config[:auth_file])
         @htauth_csum = csum
       end
       @htauth_file
-    rescue IOError
+    rescue *[SystemCallError, HTAuth::FileAccessError]
       logger.error "htauth_file can not be read: #{::File.expand_path(Config[:auth_file])}"
-    ensure
       tmp = Tempfile.new('kibana_htauth_')
       htauth = HTAuth::PasswdFile.open(tmp.path)
       htauth.load_entries
