@@ -51,7 +51,7 @@ class Kibana
 
     def htauth_file
       # read file if it's been updated or never read
-      csum = ::Digest::MD5.file(Config[:auth_file]).digest
+      csum = ::Digest::MD5.file(Config[:auth_file]).digest recue nil
       if @htauth_csum.nil? || csum != @htauth_csum
         @htauth_file   = HTAuth::PasswdFile.open(Config[:auth_file])
         @htauth_csum = csum
