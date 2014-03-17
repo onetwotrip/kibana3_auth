@@ -32,7 +32,9 @@ class Kibana
     def authenticated?
       user, pass = auth.credentials
       entry = htauth_file.fetch(user)
-      entry && entry.authenticated?(pass)
+      result = entry && entry.authenticated?(pass)
+      logger.error "Authentication failed client: #{request.ip}, user: #{user}" unless result
+      result
     end
 
     post '/auth' do
