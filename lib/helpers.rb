@@ -32,4 +32,15 @@ class Kibana
       SharedLogger.logger
     end
   end
+
+  module RouteHelpers
+    def any(path, opts = {}, &block)
+      ['GET', 'HEAD', 'DELETE', 'OPTIONS', 'PUT', 'POST'].each do |r|
+        conditions = @conditions.dup
+        route(r, path, opts, &block)
+        @conditions = conditions
+      end
+    end
+  end
+
 end

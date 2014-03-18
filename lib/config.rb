@@ -17,7 +17,8 @@ class Kibana
       :auth_file    => 'htpasswd',
       :session_domain => nil,
       :session_expire => 7200, # 2 hours
-      :session_secret => 'change_me'
+      :session_secret => 'change_me',
+      :elasticsearch  => nil
     }
 
     def basedir

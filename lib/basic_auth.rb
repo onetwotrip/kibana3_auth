@@ -41,6 +41,7 @@ class Kibana
       session[:authenticated] = false
       protected!
       session[:authenticated] = true
+      session[:remote_user]   = auth.credentials.first
       logger.debug "/auth referrer to redirect back is #{back}"
       if back.to_s.empty?
         [200, "authorized\n"]

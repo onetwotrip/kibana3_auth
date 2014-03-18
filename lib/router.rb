@@ -1,11 +1,15 @@
 require 'sinatra/base'
+require 'digest/sha1'
 require 'helpers'
 require 'config'
 require 'basic_auth'
+require 'proxy'
 
 class Kibana
   class Router < Sinatra::Base
-    include SharedLogger
+    include Kibana::SharedLogger
+    include Kibana::Proxy
+    extend  Kibana::RouteHelpers
 
     # if configuration parsing has failed
     logger = SharedLogger.logger
@@ -41,25 +45,6 @@ class Kibana
       end
     end
 
-    get "/logout" do
-      logger.debug("Logout triggered redirect to #{back}")
-      session[:authenticated] = false
-    end
-
-    get "/*" do
-      display_login!
-      request.path_info = '/index.html' if request.path_info == '/'
-      status, rackfile = catch(:halt) do
-        send_file(::File.join(settings.kibana_root, request.path_info))
-      end
-      if request.path_info == '/index.html'
-        html = ''; rackfile.each {|i| html += i}
-        [status, headers, mangle(html)]
-      else
-        [status, rackfile]
-      end
-    end
-
     # insert logout header and script into html
     def mangle(html)
       html   = html.dup
@@ -69,6 +54,50 @@ class Kibana
       html.gsub!(/(<head.*?>)/, "\\1\n#{logout}")
       headers['Content-Length'] = html.bytesize.to_s
       html
+    end
+
+    def dashboard_namespace
+      Digest::SHA1::hexdigest(session[:remote_user])
+    end
+
+    def pass_to_elasticsearch
+      if Config[:elasticsearch].nil?
+        logger.error "Proxy is disabled, set the :elasticsearch option"
+        halt 502
+      else
+        proxy_pass Config[:elasticsearch]
+      end
+    end
+
+    # == Routes
+    get "/logout" do
+      logger.debug("Logout triggered redirect to #{back}")
+      session.clear
+    end
+
+    any "/kibana-int/*" do
+      request.path_info.gsub!(%r`^/kibana-int`, "kibana-int_#{dashboard_namespace}")
+      pass_to_elasticsearch
+    end
+
+    get "/*" do
+      display_login!
+      puts request.env
+      session[:namespace] ||= env['HTTP_REMOTE_USER']
+
+      request.path_info = '/index.html' if request.path_info == '/'
+      status, rackfile = catch(:halt) do
+        send_file(::File.join(settings.kibana_root, request.path_info))
+      end
+      if request.path_info == '/index.html' && status == 200
+        html = ''; rackfile.each {|i| html += i}
+        [status, headers, mangle(html)]
+      else
+        if status == 404
+          logger.error "Can't open file #{request.path_info}, check :kibana_root option (#{settings.kibana_root})"
+        end
+        [status, rackfile]
+      end
     end
 
   end
