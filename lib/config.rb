@@ -41,7 +41,10 @@ class Kibana
     private
 
     def config
-      @config ||= DEFAULT_SETTINGS.merge(load_config)
+      @config ||= begin
+        from_file = load_config.inject({}) {|h, kv| h[kv.first.to_sym] = kv.last; h}
+        DEFAULT_SETTINGS.merge(from_file)
+      end
     end
 
     def load_config

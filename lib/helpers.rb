@@ -13,7 +13,7 @@ class Kibana
         if Config[:logging]
           @logger = ::Logger.new(STDERR)
           begin
-            loglevel = eval('::Logger::' + Config[:log_level].upcase)
+            loglevel = eval('::Logger::' + Config[:log_level].to_s.upcase)
             @logger.level = loglevel
           rescue
             @logger.error("Unknown Log Level #{Config[:log_level]}, info is used")
