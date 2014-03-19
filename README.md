@@ -5,7 +5,9 @@ Kibana3 is a pure JavaScript application and doesn't provide any form of user is
 
 ## Features
 
-x
+ * Supports proxying requests to ElasticSearch.
+ * Supports HTTP Basic Authentication.
+ * Supports private user dashboards.
 
 ## Installation and setup
 
@@ -71,3 +73,21 @@ Configuration file *config.rb* contains ruby hash containing application options
  * __session_domain__   -   session cookie domain. Default is `nil`.
  * __session_expire__   -   session cookie experation time. Default is `7200` (*2 hours*).
  * __session_secret__   -   session secure secret, must be set to a random value. Default is `"change_me"`.
+ * __elasticsearch__    -   ElasticSearch backend, when used in proxy mode. Default is `nil`.
+
+
+## Usage
+
+### Using private user dashboards
+
+This feature requres Kibana Auth to work in the proxy mode. Basically idea is that that requests should be directed to Kibana Auth. Dashboard locations (__'/kibana-int/.*'__) are rewriten to a user specific path and passed futher to the elasticsearch instance.
+
+Sample nginx configuration is given in *samples/nginx-peruser_dashboards.conf* file. Futher you should specify __elasticsearch__ backend in the configuration file like the following way:
+
+    {
+        logging:        true,
+        log_level:      'info',
+        session_secret: 'change_me',
+        auth_file:      '/etc/nginx/conf.d/kibana.htpasswd',
+        elasticsearch:  '127.0.0.1:9200'
+    }
