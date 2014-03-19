@@ -82,7 +82,6 @@ class Kibana
 
     get "/*" do
       display_login!
-      puts request.env
       session[:namespace] ||= env['HTTP_REMOTE_USER']
 
       request.path_info = '/index.html' if request.path_info == '/'
