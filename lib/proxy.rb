@@ -18,7 +18,7 @@ class Kibana
         when "PUT", "POST"
           req = Net::HTTP.const_get(m.capitalize).new(request.fullpath)
           req.body = request.body.read
-          request_headers.each {|kv| req[kv.first] = kv.last}node['kibana']['auth']['file_path']
+          request_headers.each {|kv| req[kv.first] = kv.last}
         else
           logger.error("HTTP method #{m} is not supported")
           halt 405
