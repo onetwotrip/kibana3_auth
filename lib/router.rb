@@ -31,7 +31,7 @@ class Kibana
 
     # pasthrough all config options as settings
     configure do
-      set :protection, :except => [:json_csrf]
+      set :protection, :except => [:json_csrf, :http_origin]
       set :bind, '0.0.0.0'
       set :port, 9292
       Config::DEFAULT_SETTINGS.keys.each do |k|
@@ -77,7 +77,7 @@ class Kibana
     end
 
     any "/kibana-int/*" do
-      request.path_info.gsub!(%r`^/kibana-int`, "kibana-int_#{dashboard_namespace}")
+      request.path_info.gsub!(%r`^/kibana-int`, "/kibana-int_#{dashboard_namespace}")
       pass_to_elasticsearch
     end
 

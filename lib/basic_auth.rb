@@ -14,7 +14,7 @@ class Kibana
                                 :expire_after => Config[:session_expire],
                                 :secret => Config[:session_secret]
 
-    set :protection, :except => [:json_csrf]
+    set :protection, :except => [:json_csrf, :http_origin]
 
     def protected!
       authenticate! unless auth.provided?
