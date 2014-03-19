@@ -6,5 +6,5 @@ if self.is_a? Rack::Builder
   run Kibana::Router.new
 else
   # direct invokation
-  Kibana::Router.run!  
+  Kibana::Router.run!
 end

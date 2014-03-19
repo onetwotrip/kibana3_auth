@@ -14,6 +14,8 @@ class Kibana
                                 :expire_after => Config[:session_expire],
                                 :secret => Config[:session_secret]
 
+    set :protection, :except => [:json_csrf]
+
     def protected!
       authenticate! unless auth.provided?
       halt 400, "Basic Authentication is required\n" unless auth.basic?

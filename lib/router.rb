@@ -31,6 +31,7 @@ class Kibana
 
     # pasthrough all config options as settings
     configure do
+      set :protection, :except => [:json_csrf]
       set :bind, '0.0.0.0'
       set :port, 9292
       Config::DEFAULT_SETTINGS.keys.each do |k|
