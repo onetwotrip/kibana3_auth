@@ -1,4 +1,5 @@
 require 'net/http'
+require 'timeout'
 require 'config'
 require 'helpers'
 
@@ -27,6 +28,8 @@ class Kibana
       end
       halt res.code.to_i, res.to_hash, [res.body]
     rescue SystemCallError
+      halt 503
+    rescue Timeout::Error
       halt 504
     end
 
