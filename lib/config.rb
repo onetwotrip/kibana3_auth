@@ -51,7 +51,8 @@ class Kibana
     def load_config
       # safely read config suppose it's supposed to be kind of hash
       content = ::File.open(path).read
-      serialized = IO.popen(['ruby', '-e', Config::SAFE_HASH_EVAL]).read
+      f = IO.popen(['ruby', '-e', Config::SAFE_HASH_EVAL])
+      serialized = f.read; f.close
       data = Marshal.load(serialized)
       data =  case data
               when Hash
