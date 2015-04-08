@@ -24,6 +24,7 @@ class Kibana
           logger.error("HTTP method #{m} is not supported")
           halt 405
         end
+        req ['Accept-Encoding'] = ''
         http.request(req)
       end
       halt res.code.to_i, res.to_hash, [res.body]
